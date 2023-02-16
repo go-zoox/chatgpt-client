@@ -75,14 +75,17 @@ import (
 )
 
 func main(t *testing.T) {
-	client, err :=chatgpt.New(&Config{
+	client, err := chatgpt.New(&Config{
 		APIKey: os.Getenv("API_KEY"),
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	conversation, _ := client.GetOrCreateConversation(uuid.V4(), &chatgpt.ConversationConfig{})
+	conversation, err := client.GetOrCreateConversation(uuid.V4(), &chatgpt.ConversationConfig{})
+  if err != nil {
+    log.Fatal(err)
+  }
 
 	var question []byte
 	var answer []byte
@@ -110,9 +113,6 @@ func main(t *testing.T) {
 		log.Fatal(err)
 	}
 	fmt.Printf("answer: %s\n\n", answer)
-
-	prompt, _ := conversation.BuildPrompt()
-	fmt.Printf("prompt:\n\n%s\n", prompt)
 }
 ```
 
