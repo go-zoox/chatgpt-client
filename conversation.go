@@ -2,6 +2,7 @@ package chatgptclient
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/go-zoox/core-utils/safe"
 	"github.com/go-zoox/datetime"
@@ -31,6 +32,7 @@ type ConversationConfig struct {
 	ID          string
 	Context     string
 	MaxMessages int
+	MaxAge      time.Duration
 }
 
 // NewConversation creates a new Conversation.

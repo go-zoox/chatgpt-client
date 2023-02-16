@@ -6,6 +6,7 @@ require (
 	github.com/go-zoox/core-utils v1.2.2
 	github.com/go-zoox/datetime v1.1.1
 	github.com/go-zoox/dotenv v1.2.3
+	github.com/go-zoox/lru v1.0.1
 	github.com/go-zoox/openai-client v1.0.4
 	github.com/go-zoox/testify v1.0.0
 	github.com/go-zoox/uuid v0.0.1

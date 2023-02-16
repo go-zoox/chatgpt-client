@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/go-zoox/core-utils/strings"
+	"github.com/go-zoox/lru"
 
 	openai "github.com/go-zoox/openai-client"
 )
@@ -18,19 +19,27 @@ type Client interface {
 type client struct {
 	core openai.Client
 	cfg  *Config
+	//
+	conversationsCache *lru.LRU
 }
 
 // Config is the configuration for the ChatGPT Client.
 type Config struct {
-	APIKey            string `json:"api_key"`
-	APIServer         string `json:"api_server"`
-	MaxResponseTokens int    `json:"max_response_tokens"`
+	APIKey             string `json:"api_key"`
+	APIServer          string `json:"api_server"`
+	MaxResponseTokens  int    `json:"max_response_tokens"`
+	MaxConversations   int    `json:"max_conversations"`
+	ConversationMaxAge int    `json:"conversation_max_age"`
 }
 
 // New creates a new ChatGPT Client.
 func New(cfg *Config) (Client, error) {
 	if cfg.MaxResponseTokens == 0 {
 		cfg.MaxResponseTokens = DefaultMaxResponseTokens
+	}
+
+	if cfg.MaxConversations == 0 {
+		cfg.MaxConversations = DefaultMaxConversations
 	}
 
 	core, err := openai.New(&openai.Config{
@@ -42,8 +51,9 @@ func New(cfg *Config) (Client, error) {
 	}
 
 	return &client{
-		core: core,
-		cfg:  cfg,
+		core:               core,
+		cfg:                cfg,
+		conversationsCache: lru.New(cfg.MaxConversations),
 	}, nil
 }
 
@@ -64,10 +74,27 @@ func (c *client) Ask(question []byte) (answer []byte, err error) {
 	return []byte(strings.TrimSpace(completion.Choices[0].Text)), nil
 }
 
-func (c *client) GetOrCreateConversation(id string, cfg *ConversationConfig) (Conversation, error) {
+func (c *client) GetOrCreateConversation(id string, cfg *ConversationConfig) (conversation Conversation, err error) {
 	if cfg.ID == "" {
 		cfg.ID = id
 	}
+	if cfg.MaxAge == 0 {
+		cfg.MaxAge = DefaultConversationMaxAge
+	}
 
-	return NewConversation(c, cfg)
+	if cache, ok := c.conversationsCache.Get(cfg.ID); ok {
+		if c, ok := cache.(Conversation); ok {
+			conversation = c
+			return conversation, nil
+		}
+	}
+
+	conversation, err = NewConversation(c, cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	c.conversationsCache.Set(id, conversation, cfg.MaxAge)
+
+	return conversation, nil
 }
