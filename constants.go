@@ -1,9 +1,13 @@
 package chatgptclient
 
-import "time"
+import (
+	"time"
+
+	openai "github.com/go-zoox/openai-client"
+)
 
 // DefaultMaxRequestResponseTokens ...
-const DefaultMaxRequestResponseTokens = 4097
+const DefaultMaxRequestResponseTokens = openai.MaxTokens
 
 // DefaultMaxResponseTokens is the default response text max tokens.
 const DefaultMaxResponseTokens = 1000
