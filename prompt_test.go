@@ -25,7 +25,7 @@ func TestBuildPrompt(t *testing.T) {
 		IsChatGPT: false,
 	})
 
-	prompt, err := buildPrompt(DefaultContext, "2023-02-16", messages)
+	prompt, err := buildPrompt(DefaultContext, "2023-02-16", messages, 0)
 	if err != nil {
 		t.Fatal(err)
 	}

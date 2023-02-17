@@ -29,10 +29,11 @@ type conversation struct {
 
 // ConversationConfig is the configuration for creating a new Conversation.
 type ConversationConfig struct {
-	ID          string
-	Context     string
-	MaxMessages int
-	MaxAge      time.Duration
+	ID               string
+	Context          string
+	MaxMessages      int
+	MaxAge           time.Duration
+	MaxRequestTokens int
 }
 
 // NewConversation creates a new Conversation.
@@ -96,5 +97,10 @@ func (c *conversation) Messages() *safe.List {
 }
 
 func (c *conversation) BuildPrompt() (prompt []byte, err error) {
-	return buildPrompt(c.cfg.Context, datetime.Now().Format("YYYY-MM-DD"), c.messages)
+	return buildPrompt(
+		c.cfg.Context,
+		datetime.Now().Format("YYYY-MM-DD"),
+		c.messages,
+		c.cfg.MaxRequestTokens,
+	)
 }

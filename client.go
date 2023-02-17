@@ -25,15 +25,20 @@ type client struct {
 
 // Config is the configuration for the ChatGPT Client.
 type Config struct {
-	APIKey             string `json:"api_key"`
-	APIServer          string `json:"api_server"`
-	MaxResponseTokens  int    `json:"max_response_tokens"`
-	MaxConversations   int    `json:"max_conversations"`
-	ConversationMaxAge int    `json:"conversation_max_age"`
+	APIKey                   string `json:"api_key"`
+	APIServer                string `json:"api_server"`
+	MaxRequestResponseTokens int    `json:"max_request_response_tokens"`
+	MaxResponseTokens        int    `json:"max_response_tokens"`
+	MaxConversations         int    `json:"max_conversations"`
+	ConversationMaxAge       int    `json:"conversation_max_age"`
 }
 
 // New creates a new ChatGPT Client.
 func New(cfg *Config) (Client, error) {
+	if cfg.MaxRequestResponseTokens == 0 {
+		cfg.MaxRequestResponseTokens = DefaultMaxRequestResponseTokens
+	}
+
 	if cfg.MaxResponseTokens == 0 {
 		cfg.MaxResponseTokens = DefaultMaxResponseTokens
 	}
@@ -80,6 +85,9 @@ func (c *client) GetOrCreateConversation(id string, cfg *ConversationConfig) (co
 	}
 	if cfg.MaxAge == 0 {
 		cfg.MaxAge = DefaultConversationMaxAge
+	}
+	if cfg.MaxRequestTokens == 0 {
+		cfg.MaxRequestTokens = c.cfg.MaxRequestResponseTokens - c.cfg.MaxResponseTokens
 	}
 
 	if cache, ok := c.conversationsCache.Get(cfg.ID); ok {

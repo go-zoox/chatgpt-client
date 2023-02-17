@@ -2,6 +2,9 @@ package chatgptclient
 
 import "time"
 
+// DefaultMaxRequestResponseTokens ...
+const DefaultMaxRequestResponseTokens = 4097
+
 // DefaultMaxResponseTokens is the default response text max tokens.
 const DefaultMaxResponseTokens = 1000
 
