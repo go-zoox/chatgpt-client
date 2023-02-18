@@ -11,7 +11,7 @@ import (
 
 // Conversation is the conversation interface.
 type Conversation interface {
-	Ask(question []byte) (answer []byte, err error)
+	Ask(question []byte, cfg ...*ConversationAskConfig) (answer []byte, err error)
 	//
 	ID() string
 	Messages() *safe.List
@@ -36,6 +36,11 @@ type ConversationConfig struct {
 	MaxRequestTokens int
 }
 
+// ConversationAskConfig is the configuration for ask question.
+type ConversationAskConfig struct {
+	User string `json:"user"`
+}
+
 // NewConversation creates a new Conversation.
 func NewConversation(client *client, cfg *ConversationConfig) (Conversation, error) {
 	if cfg.ID == "" {
@@ -56,12 +61,17 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 	}, nil
 }
 
-func (c *conversation) Ask(question []byte) (answer []byte, err error) {
+func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answer []byte, err error) {
+	cfgX := &ConversationAskConfig{}
+	if len(cfg) > 0 && cfg[0] != nil {
+		cfgX = cfg[0]
+	}
 	c.messages.Push(&Message{
 		ID:             uuid.V4(),
 		Text:           string(question),
 		IsChatGPT:      false,
 		ConversationID: c.id,
+		User:           cfgX.User,
 	})
 
 	prompt, err := c.BuildPrompt()
