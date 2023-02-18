@@ -6,4 +6,8 @@ type Message struct {
 	Text           string `json:"text"`
 	IsChatGPT      bool   `json:"is_chatgpt"`
 	ConversationID string `json:"conversation"`
+	CreatedAt      string `json:"created_at"`
+
+	// User used for support multiple users, like group chat
+	User string `json:"user"`
 }

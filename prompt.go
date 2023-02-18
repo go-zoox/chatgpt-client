@@ -30,7 +30,11 @@ func buildPrompt(context, date string, messages *safe.List, maxLength int) (prom
 		if message.IsChatGPT {
 			coreMessages = append(coreMessages, fmt.Sprintf("ChatGPT:\n\n%s", message.Text))
 		} else {
-			coreMessages = append(coreMessages, fmt.Sprintf("User:\n\n%s", message.Text))
+			if message.User != "" {
+				coreMessages = append(coreMessages, fmt.Sprintf("%s:\n\n%s", message.User, message.Text))
+			} else {
+				coreMessages = append(coreMessages, fmt.Sprintf("User:\n\n%s", message.Text))
+			}
 		}
 
 		return false
