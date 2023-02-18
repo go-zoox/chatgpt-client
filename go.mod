@@ -3,7 +3,7 @@ module github.com/go-zoox/chatgpt-client
 go 1.18
 
 require (
-	github.com/go-zoox/core-utils v1.2.4
+	github.com/go-zoox/core-utils v1.2.6
 	github.com/go-zoox/datetime v1.1.1
 	github.com/go-zoox/dotenv v1.2.3
 	github.com/go-zoox/lru v1.0.1

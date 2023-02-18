@@ -51,7 +51,7 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 	return &conversation{
 		client:   client,
 		id:       cfg.ID,
-		messages: safe.NewList(),
+		messages: safe.NewList(cfg.MaxMessages),
 		cfg:      cfg,
 	}, nil
 }
@@ -80,10 +80,6 @@ func (c *conversation) Ask(question []byte) (answer []byte, err error) {
 		IsChatGPT:      true,
 		ConversationID: c.id,
 	})
-
-	if c.messages.Size() > c.cfg.MaxMessages {
-		c.messages.Shift()
-	}
 
 	return answer, nil
 }

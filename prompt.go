@@ -19,9 +19,9 @@ func buildPrompt(context, date string, messages *safe.List, maxLength int) (prom
 
 	charCountRes := 0
 	coreMessages := []string{}
-	messages.Reverse().ForEach(func(i interface{}) {
+	messages.Reverse().ForEach(func(i interface{}) (done bool) {
 		if maxLength > 0 && charCountRes >= maxLength {
-			return
+			return true
 		}
 
 		message := i.(*Message)
@@ -32,6 +32,8 @@ func buildPrompt(context, date string, messages *safe.List, maxLength int) (prom
 		} else {
 			coreMessages = append(coreMessages, fmt.Sprintf("User:\n\n%s", message.Text))
 		}
+
+		return false
 	})
 
 	contextMessage := fmt.Sprintf("%s\nCurrent date: %s", context, date)
