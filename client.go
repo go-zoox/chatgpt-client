@@ -63,13 +63,14 @@ func New(cfg *Config) (Client, error) {
 }
 
 func (c *client) Ask(question []byte) (answer []byte, err error) {
-	numTokens := float64(len(question))
-	maxTokens := math.Max(1, math.Min(openai.MaxTokens-numTokens, float64(c.cfg.MaxResponseTokens)))
+	// numTokens := float64(len(question))
+	// maxTokens := math.Max(float64(c.cfg.MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(c.cfg.MaxResponseTokens)))
 
 	completion, err := c.core.CreateCompletion(&openai.CreateCompletionRequest{
-		Model:       openai.ModelTextDavinci003,
-		Prompt:      string(question),
-		MaxTokens:   int(maxTokens),
+		Model:  openai.ModelTextDavinci003,
+		Prompt: string(question),
+		// MaxTokens:   int(maxTokens),
+		MaxTokens:   calculationPromptMaxTokens(len(question), c.cfg.MaxResponseTokens),
 		Temperature: 1,
 	})
 	if err != nil {
@@ -105,4 +106,11 @@ func (c *client) GetOrCreateConversation(id string, cfg *ConversationConfig) (co
 	c.conversationsCache.Set(id, conversation, cfg.MaxAge)
 
 	return conversation, nil
+}
+
+func calculationPromptMaxTokens(questLength, MaxResponseTokens int) int {
+	numTokens := float64(questLength)
+	maxTokens := math.Max(float64(MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(MaxResponseTokens)))
+
+	return int(maxTokens)
 }

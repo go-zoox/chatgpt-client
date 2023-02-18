@@ -38,7 +38,8 @@ type ConversationConfig struct {
 
 // ConversationAskConfig is the configuration for ask question.
 type ConversationAskConfig struct {
-	User string `json:"user"`
+	User      string    `json:"user"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 // NewConversation creates a new Conversation.
@@ -66,12 +67,17 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 	if len(cfg) > 0 && cfg[0] != nil {
 		cfgX = cfg[0]
 	}
+	if cfgX.CreatedAt.IsZero() {
+		cfgX.CreatedAt = time.Now()
+	}
+
 	c.messages.Push(&Message{
 		ID:             uuid.V4(),
 		Text:           string(question),
 		IsChatGPT:      false,
 		ConversationID: c.id,
 		User:           cfgX.User,
+		CreatedAt:      cfgX.CreatedAt,
 	})
 
 	prompt, err := c.BuildPrompt()
