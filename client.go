@@ -67,11 +67,9 @@ func (c *client) Ask(question []byte) (answer []byte, err error) {
 	// maxTokens := math.Max(float64(c.cfg.MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(c.cfg.MaxResponseTokens)))
 
 	completion, err := c.core.CreateCompletion(&openai.CreateCompletionRequest{
-		Model:  openai.ModelTextDavinci003,
-		Prompt: string(question),
-		// MaxTokens:   int(maxTokens),
-		MaxTokens:   calculationPromptMaxTokens(len(question), c.cfg.MaxResponseTokens),
-		Temperature: 1,
+		Model:     openai.ModelTextDavinci003,
+		Prompt:    string(question),
+		MaxTokens: calculationPromptMaxTokens(len(question), c.cfg.MaxResponseTokens),
 	})
 	if err != nil {
 		return nil, err
