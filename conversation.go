@@ -40,6 +40,7 @@ type ConversationConfig struct {
 type ConversationAskConfig struct {
 	User      string    `json:"user"`
 	CreatedAt time.Time `json:"created_at"`
+	Model     string    `json:"model"`
 }
 
 // NewConversation creates a new Conversation.
@@ -85,7 +86,9 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		return nil, fmt.Errorf("failed to build prompt: %v", err)
 	}
 
-	answer, err = c.client.Ask(prompt)
+	answer, err = c.client.Ask(prompt, &AskConfig{
+		Model: cfgX.Model,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ask: %v", err)
 	}

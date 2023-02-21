@@ -11,7 +11,7 @@ import (
 
 // Client is the ChatGPT Client.
 type Client interface {
-	Ask(question []byte) ([]byte, error)
+	Ask(question []byte, cfg ...*AskConfig) ([]byte, error)
 	//
 	GetOrCreateConversation(id string, cfg *ConversationConfig) (Conversation, error)
 	//
@@ -34,6 +34,11 @@ type Config struct {
 	MaxResponseTokens        int    `json:"max_response_tokens"`
 	MaxConversations         int    `json:"max_conversations"`
 	ConversationMaxAge       int    `json:"conversation_max_age"`
+}
+
+// AskConfig ...
+type AskConfig struct {
+	Model string `json:"model"`
 }
 
 // New creates a new ChatGPT Client.
@@ -65,12 +70,20 @@ func New(cfg *Config) (Client, error) {
 	}, nil
 }
 
-func (c *client) Ask(question []byte) (answer []byte, err error) {
+func (c *client) Ask(question []byte, cfg ...*AskConfig) (answer []byte, err error) {
 	// numTokens := float64(len(question))
 	// maxTokens := math.Max(float64(c.cfg.MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(c.cfg.MaxResponseTokens)))
 
+	cfgX := &AskConfig{}
+	if len(cfg) > 0 && cfg[0] != nil {
+		cfgX = cfg[0]
+	}
+	if cfgX.Model == "" {
+		cfgX.Model = openai.ModelTextDavinci003
+	}
+
 	completion, err := c.core.CreateCompletion(&openai.CreateCompletionRequest{
-		Model:     openai.ModelTextDavinci003,
+		Model:     cfgX.Model,
 		Prompt:    string(question),
 		MaxTokens: calculationPromptMaxTokens(len(question), c.cfg.MaxResponseTokens),
 	})
