@@ -82,10 +82,13 @@ func (c *client) Ask(question []byte, cfg ...*AskConfig) (answer []byte, err err
 		cfgX.Model = openai.ModelTextDavinci003
 	}
 
+	questionX := string(question)
+	maxTokens := calculationPromptMaxTokens(len(question), c.cfg.MaxResponseTokens)
+
 	completion, err := c.core.CreateCompletion(&openai.CreateCompletionRequest{
 		Model:     cfgX.Model,
-		Prompt:    string(question),
-		MaxTokens: calculationPromptMaxTokens(len(question), c.cfg.MaxResponseTokens),
+		Prompt:    questionX,
+		MaxTokens: maxTokens,
 	})
 	if err != nil {
 		return nil, err
