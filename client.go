@@ -14,6 +14,9 @@ type Client interface {
 	Ask(question []byte) ([]byte, error)
 	//
 	GetOrCreateConversation(id string, cfg *ConversationConfig) (Conversation, error)
+	//
+	ResetConversations() error
+	ResetConversation(id string) error
 }
 
 type client struct {
@@ -104,6 +107,18 @@ func (c *client) GetOrCreateConversation(id string, cfg *ConversationConfig) (co
 	c.conversationsCache.Set(id, conversation, cfg.MaxAge)
 
 	return conversation, nil
+}
+
+func (c *client) ResetConversations() error {
+	c.conversationsCache.Clear()
+
+	return nil
+}
+
+func (c *client) ResetConversation(id string) error {
+	c.conversationsCache.Delete(id)
+
+	return nil
 }
 
 func calculationPromptMaxTokens(questLength, MaxResponseTokens int) int {
