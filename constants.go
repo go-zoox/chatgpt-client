@@ -19,4 +19,4 @@ const DefaultMaxConversations = 1000
 const DefaultConversationMaxAge = 2 * time.Hour
 
 // DefaultContext is the default context for instructions to ChatGPT.
-const DefaultContext = "Instructions:\nYou are ChatGPT, a large language model trained by OpenAI.\nCurrent date: {{.today}}"
+const DefaultContext = "Instructions:\nYou are ChatGPT, a large language model trained by OpenAI.\nCurrent date: {{.date}}"

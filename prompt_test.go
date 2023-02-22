@@ -1,9 +1,11 @@
 package chatgptclient
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/go-zoox/core-utils/safe"
+	"github.com/go-zoox/datetime"
 	"github.com/go-zoox/testify"
 )
 
@@ -30,9 +32,9 @@ func TestBuildPrompt(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `Instructions:
+	expected := fmt.Sprintf(`Instructions:
 You are ChatGPT, a large language model trained by OpenAI.
-Current date: {{.today}}<|endoftext|>
+Current date: %s<|endoftext|>
 
 User:
 
@@ -46,7 +48,7 @@ User:
 
 Can you expand on that?<|endoftext|>
 
-ChatGPT:`
+ChatGPT:`, datetime.Now().Format("YYYY-MM-DD"))
 
 	testify.Equal(t, expected, string(prompt))
 }
@@ -76,9 +78,9 @@ func TestBuildPromptMultiUsers(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `Instructions:
+	expected := fmt.Sprintf(`Instructions:
 You are ChatGPT, a large language model trained by OpenAI.
-Current date: {{.today}}<|endoftext|>
+Current date: %s<|endoftext|>
 
 Zero:
 
@@ -92,7 +94,7 @@ Amy:
 
 Can you expand on that?<|endoftext|>
 
-ChatGPT:`
+ChatGPT:`, datetime.Now().Format("YYYY-MM-DD"))
 
 	testify.Equal(t, expected, string(prompt))
 }
@@ -120,15 +122,15 @@ func TestBuildPromptMaxLength(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `Instructions:
+	expected := fmt.Sprintf(`Instructions:
 You are ChatGPT, a large language model trained by OpenAI.
-Current date: {{.today}}<|endoftext|>
+Current date: %s<|endoftext|>
 
 User:
 
 Can you expand on that?<|endoftext|>
 
-ChatGPT:`
+ChatGPT:`, datetime.Now().Format("YYYY-MM-DD"))
 
 	testify.Equal(t, expected, string(prompt))
 }
