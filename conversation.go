@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/go-zoox/core-utils/safe"
-	"github.com/go-zoox/datetime"
 	"github.com/go-zoox/uuid"
 )
 
@@ -31,6 +30,7 @@ type conversation struct {
 type ConversationConfig struct {
 	ID               string
 	Context          string
+	Language         string
 	MaxMessages      int
 	MaxAge           time.Duration
 	MaxRequestTokens int
@@ -50,6 +50,9 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 	}
 	if cfg.Context == "" {
 		cfg.Context = DefaultContext
+		if cfg.Language != "" {
+			cfg.Context = fmt.Sprintf("%s\nLanuage: %s", cfg.Context, cfg.Language)
+		}
 	}
 	if cfg.MaxMessages == 0 {
 		cfg.MaxMessages = 100
@@ -114,7 +117,6 @@ func (c *conversation) Messages() *safe.List {
 func (c *conversation) BuildPrompt() (prompt []byte, err error) {
 	return buildPrompt(
 		c.cfg.Context,
-		datetime.Now().Format("YYYY-MM-DD"),
 		c.messages,
 		c.cfg.MaxRequestTokens,
 	)

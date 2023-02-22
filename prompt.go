@@ -6,8 +6,8 @@ import (
 	"github.com/go-zoox/core-utils/safe"
 )
 
-func buildPrompt(context, date string, messages *safe.List, maxLength int) (prompt []byte, err error) {
-	contextMessage := fmt.Sprintf("%s\nCurrent date: %s", context, date)
+func buildPrompt(context string, messages *safe.List, maxLength int) (prompt []byte, err error) {
+	contextMessage := fmt.Sprintf("%s", context)
 	endMessage := "ChatGPT:"
 	endOfText := "<|endoftext|>\n\n"
 

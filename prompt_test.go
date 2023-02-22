@@ -25,14 +25,14 @@ func TestBuildPrompt(t *testing.T) {
 		IsChatGPT: false,
 	})
 
-	prompt, err := buildPrompt(DefaultContext, "2023-02-16", messages, 0)
+	prompt, err := buildPrompt(DefaultContext, messages, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	expected := `Instructions:
 You are ChatGPT, a large language model trained by OpenAI.
-Current date: 2023-02-16<|endoftext|>
+Current date: {{.today}}<|endoftext|>
 
 User:
 
@@ -71,14 +71,14 @@ func TestBuildPromptMultiUsers(t *testing.T) {
 		User:      "Amy",
 	})
 
-	prompt, err := buildPrompt(DefaultContext, "2023-02-16", messages, 0)
+	prompt, err := buildPrompt(DefaultContext, messages, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	expected := `Instructions:
 You are ChatGPT, a large language model trained by OpenAI.
-Current date: 2023-02-16<|endoftext|>
+Current date: {{.today}}<|endoftext|>
 
 Zero:
 
@@ -115,14 +115,14 @@ func TestBuildPromptMaxLength(t *testing.T) {
 		IsChatGPT: false,
 	})
 
-	prompt, err := buildPrompt(DefaultContext, "2023-02-16", messages, 300)
+	prompt, err := buildPrompt(DefaultContext, messages, 300)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	expected := `Instructions:
 You are ChatGPT, a large language model trained by OpenAI.
-Current date: 2023-02-16<|endoftext|>
+Current date: {{.today}}<|endoftext|>
 
 User:
 
