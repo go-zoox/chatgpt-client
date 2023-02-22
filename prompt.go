@@ -1,30 +1,22 @@
 package chatgptclient
 
 import (
-	"bytes"
 	"fmt"
-	"text/template"
+
+	"github.com/go-zoox/core-utils/strings"
 
 	"github.com/go-zoox/core-utils/safe"
 	"github.com/go-zoox/datetime"
 )
 
 func buildPrompt(context string, messages *safe.List, maxLength int) (prompt []byte, err error) {
-	contextTmpl := template.New("context")
-
-	if contextTmpl, err = contextTmpl.Parse(context); err != nil {
-		return nil, fmt.Errorf("failed to parse context message: %v", err)
-	}
-	// 使用 buffer 来格式化字符串，再把 buffer 写入 result
-	buffer := &bytes.Buffer{}
-	err = contextTmpl.Execute(buffer, map[string]interface{}{
+	contextMessage, err := strings.Template(context, map[string]interface{}{
 		"date": datetime.Now().Format("YYYY-MM-DD"),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate context message from template: %v", err)
+		return nil, fmt.Errorf("failed to render context message: %v", err)
 	}
 
-	contextMessage := buffer.String()
 	endMessage := "ChatGPT:"
 	endOfText := "<|endoftext|>\n\n"
 
