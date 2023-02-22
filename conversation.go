@@ -34,13 +34,13 @@ type ConversationConfig struct {
 	MaxMessages      int
 	MaxAge           time.Duration
 	MaxRequestTokens int
+	Model            string `json:"model"`
 }
 
 // ConversationAskConfig is the configuration for ask question.
 type ConversationAskConfig struct {
 	User      string    `json:"user"`
 	CreatedAt time.Time `json:"created_at"`
-	Model     string    `json:"model"`
 }
 
 // NewConversation creates a new Conversation.
@@ -87,7 +87,7 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 	}
 
 	answer, err = c.client.Ask(prompt, &AskConfig{
-		Model: cfgX.Model,
+		Model: c.cfg.Model,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ask: %v", err)
