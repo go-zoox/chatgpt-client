@@ -34,6 +34,8 @@ type Config struct {
 	MaxResponseTokens        int    `json:"max_response_tokens"`
 	MaxConversations         int    `json:"max_conversations"`
 	ConversationMaxAge       int    `json:"conversation_max_age"`
+	ConversationContext      string `json:"conversation_context"`
+	ConversationLanguage     string `json:"conversation_language"`
 }
 
 // AskConfig ...
@@ -106,6 +108,12 @@ func (c *client) GetOrCreateConversation(id string, cfg *ConversationConfig) (co
 	}
 	if cfg.MaxRequestTokens == 0 {
 		cfg.MaxRequestTokens = c.cfg.MaxRequestResponseTokens - c.cfg.MaxResponseTokens
+	}
+	if cfg.Context == "" && c.cfg.ConversationContext != "" {
+		cfg.Context = c.cfg.ConversationContext
+	}
+	if cfg.Language == "" && c.cfg.ConversationLanguage != "" {
+		cfg.Language = c.cfg.ConversationLanguage
 	}
 
 	if cache, ok := c.conversationsCache.Get(cfg.ID); ok {
