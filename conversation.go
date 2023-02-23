@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-zoox/core-utils/safe"
+	"github.com/go-zoox/logger"
 	"github.com/go-zoox/uuid"
 )
 
@@ -19,9 +20,10 @@ type Conversation interface {
 }
 
 type conversation struct {
-	client   *client
-	id       string
-	messages *safe.List
+	client      *client
+	id          string
+	messages    *safe.List
+	messagesMap map[string]bool
 	//
 	cfg *ConversationConfig
 }
@@ -39,6 +41,7 @@ type ConversationConfig struct {
 
 // ConversationAskConfig is the configuration for ask question.
 type ConversationAskConfig struct {
+	ID        string    `json:"id"`
 	User      string    `json:"user"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -71,12 +74,22 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 	if len(cfg) > 0 && cfg[0] != nil {
 		cfgX = cfg[0]
 	}
+	if cfgX.ID == "" {
+		logger.Warnf("ask question id is recommand")
+
+		cfgX.ID = uuid.V4()
+	}
 	if cfgX.CreatedAt.IsZero() {
 		cfgX.CreatedAt = time.Now()
 	}
 
+	if _, ok := c.messagesMap[cfgX.ID]; ok {
+		return nil, fmt.Errorf("duplicate message(id: %s) to ask", cfgX.ID)
+	}
+
+	c.messagesMap[cfgX.ID] = true
 	c.messages.Push(&Message{
-		ID:             uuid.V4(),
+		ID:             cfgX.ID,
 		Text:           string(question),
 		IsChatGPT:      false,
 		ConversationID: c.id,

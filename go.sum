@@ -12,6 +12,8 @@ github.com/go-playground/universal-translator v0.17.0 h1:icxd5fm+REJzpZx7ZfpaD87
 github.com/go-playground/universal-translator v0.17.0/go.mod h1:UkSxE5sNxxRwHyU+Scu5vgOQjsIJAF8j9muTVoKLVtA=
 github.com/go-playground/validator/v10 v10.4.1 h1:pH2c5ADXtd66mxoE0Zm9SUhxE20r7aM3F26W0hOn+GE=
 github.com/go-playground/validator/v10 v10.4.1/go.mod h1:nlOn6nFhuKACm19sB/8EGNn9GlaMV7XkbRSipzJ0Ii4=
+github.com/go-zoox/chalk v1.0.1 h1:9s4i74InfcBosCexWixz3eh6DdBkl3McIcLkTI1HjTo=
+github.com/go-zoox/chalk v1.0.1/go.mod h1:z5+qvE9nEJI5uT4px2tyoFa/xxkqf3CUo22KmXLKbNI=
 github.com/go-zoox/core-utils v1.2.7 h1:7RUWoMx1RvND8mJGypgGKPxxflBRZxtB+mwmEM5h/ig=
 github.com/go-zoox/core-utils v1.2.7/go.mod h1:Y6izFcxuELrkOen5mTQccCJxJqqPJaZV5dQtUMBdkBM=
 github.com/go-zoox/datetime v1.1.1 h1:ORZbMuSLMW3KSV9dDaGf7iKL5XqYoIn9eQuK6QMeRDY=
@@ -24,6 +26,8 @@ github.com/go-zoox/fs v1.3.7 h1:aQrdWhAHVDobn4Rr6qhiwEqrJSyLggYZozfyaRI0Qa0=
 github.com/go-zoox/fs v1.3.7/go.mod h1:wCM+UQkjFTxNjOOCNlGcN3k9FeXXUwn9bFnpyjOn55c=
 github.com/go-zoox/headers v1.0.5 h1:/W/tH0YvVnBxLZ9TrSwtvOaiIlsrMb6zvCxuWm7Fx4w=
 github.com/go-zoox/headers v1.0.5/go.mod h1:WEgEbewswEw4n4qS1iG68Kn/vOQVCAKGwwuZankc6so=
+github.com/go-zoox/logger v1.4.4 h1:050xlOkXfslwGuR57B0rA+toSXUo4UQqRCsyTw2n0UQ=
+github.com/go-zoox/logger v1.4.4/go.mod h1:o7ddvv/gMoMa0TomPhHoIz11ZWRbQ92pF6rwYbOY3iQ=
 github.com/go-zoox/lru v1.0.1 h1:AvRHxKEeEFSH9UXyfDQ5lj8nr66p6tJS3kVf/eTVyMg=
 github.com/go-zoox/lru v1.0.1/go.mod h1:xxtYsRbJ2iJKEL4OIEZ6lk0xjuGJHHZmZZhGtH5qwv0=
 github.com/go-zoox/openai-client v1.0.5 h1:WMqB3V2T8pJp3Heu9ZTAkAm7WHqIw9ri998W6i7FppQ=
