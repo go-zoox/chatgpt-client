@@ -12,6 +12,7 @@ import (
 // Conversation is the conversation interface.
 type Conversation interface {
 	Ask(question []byte, cfg ...*ConversationAskConfig) (answer []byte, err error)
+	IsQuestionAsked(id string) (err error)
 	//
 	ID() string
 	Messages() *safe.List
@@ -23,7 +24,7 @@ type conversation struct {
 	client      *client
 	id          string
 	messages    *safe.List
-	messagesMap map[string]bool
+	messagesMap *safe.Map
 	//
 	cfg *ConversationConfig
 }
@@ -62,11 +63,20 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 	}
 
 	return &conversation{
-		client:   client,
-		id:       cfg.ID,
-		messages: safe.NewList(cfg.MaxMessages),
-		cfg:      cfg,
+		client:      client,
+		id:          cfg.ID,
+		messages:    safe.NewList(cfg.MaxMessages),
+		messagesMap: safe.NewMap(),
+		cfg:         cfg,
 	}, nil
+}
+
+func (c *conversation) IsQuestionAsked(id string) (err error) {
+	if c.messagesMap.Has(id) {
+		return fmt.Errorf("duplicate message(id: %s) to ask", id)
+	}
+
+	return nil
 }
 
 func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answer []byte, err error) {
@@ -75,7 +85,7 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		cfgX = cfg[0]
 	}
 	if cfgX.ID == "" {
-		logger.Warnf("ask question id is recommand")
+		logger.Warnf("question id is recommand")
 
 		cfgX.ID = uuid.V4()
 	}
@@ -83,11 +93,11 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		cfgX.CreatedAt = time.Now()
 	}
 
-	if _, ok := c.messagesMap[cfgX.ID]; ok {
+	if c.messagesMap.Has(cfgX.ID) {
 		return nil, fmt.Errorf("duplicate message(id: %s) to ask", cfgX.ID)
 	}
 
-	c.messagesMap[cfgX.ID] = true
+	c.messagesMap.Set(cfgX.ID, true)
 	c.messages.Push(&Message{
 		ID:             cfgX.ID,
 		Text:           string(question),
