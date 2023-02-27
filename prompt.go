@@ -9,15 +9,20 @@ import (
 	"github.com/go-zoox/datetime"
 )
 
-func buildPrompt(context string, messages *safe.List, maxLength int) (prompt []byte, err error) {
+func buildPrompt(context string, messages *safe.List, maxLength int, chatGPTName string) (prompt []byte, err error) {
+	if chatGPTName == "" {
+		chatGPTName = "ChatGPT"
+	}
+
 	contextMessage, err := strings.Template(context, map[string]interface{}{
-		"date": datetime.Now().Format("YYYY-MM-DD"),
+		"date":         datetime.Now().Format("YYYY-MM-DD"),
+		"chatgpt_name": chatGPTName,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to render context message: %v", err)
 	}
 
-	endMessage := "ChatGPT:"
+	endMessage := fmt.Sprintf("%s:", chatGPTName)
 	endOfText := "<|endoftext|>\n\n"
 
 	charCountRes := len(contextMessage) + len(endMessage)
@@ -28,7 +33,7 @@ func buildPrompt(context string, messages *safe.List, maxLength int) (prompt []b
 	messages.Reverse().ForEach(func(i interface{}) (done bool) {
 		message := i.(*Message)
 		if message.IsChatGPT {
-			currentMessage = fmt.Sprintf("ChatGPT:\n\n%s", message.Text)
+			currentMessage = fmt.Sprintf("%s:\n\n%s", chatGPTName, message.Text)
 		} else {
 			if message.User != "" {
 				currentMessage = fmt.Sprintf("%s:\n\n%s", message.User, message.Text)

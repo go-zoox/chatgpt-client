@@ -38,6 +38,7 @@ type ConversationConfig struct {
 	MaxAge           time.Duration
 	MaxRequestTokens int
 	Model            string `json:"model"`
+	ChatGPTName      string `json:"chatgpt_name"`
 }
 
 // ConversationAskConfig is the configuration for ask question.
@@ -142,5 +143,6 @@ func (c *conversation) BuildPrompt() (prompt []byte, err error) {
 		c.cfg.Context,
 		c.messages,
 		c.cfg.MaxRequestTokens,
+		c.cfg.ChatGPTName,
 	)
 }

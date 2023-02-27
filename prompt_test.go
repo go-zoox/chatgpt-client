@@ -27,7 +27,7 @@ func TestBuildPrompt(t *testing.T) {
 		IsChatGPT: false,
 	})
 
-	prompt, err := buildPrompt(DefaultContext, messages, 0)
+	prompt, err := buildPrompt(DefaultContext, messages, 0, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func TestBuildPromptMultiUsers(t *testing.T) {
 		User:      "Amy",
 	})
 
-	prompt, err := buildPrompt(DefaultContext, messages, 0)
+	prompt, err := buildPrompt(DefaultContext, messages, 0, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +117,7 @@ func TestBuildPromptMaxLength(t *testing.T) {
 		IsChatGPT: false,
 	})
 
-	prompt, err := buildPrompt(DefaultContext, messages, 300)
+	prompt, err := buildPrompt(DefaultContext, messages, 300, "")
 	if err != nil {
 		t.Fatal(err)
 	}

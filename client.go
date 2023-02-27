@@ -36,6 +36,7 @@ type Config struct {
 	ConversationMaxAge       int    `json:"conversation_max_age"`
 	ConversationContext      string `json:"conversation_context"`
 	ConversationLanguage     string `json:"conversation_language"`
+	ChatGPTName              string `json:"chatgpt_name"`
 }
 
 // AskConfig ...
@@ -55,6 +56,10 @@ func New(cfg *Config) (Client, error) {
 
 	if cfg.MaxConversations == 0 {
 		cfg.MaxConversations = DefaultMaxConversations
+	}
+
+	if cfg.ChatGPTName == "" {
+		cfg.ChatGPTName = "ChatGPT"
 	}
 
 	core, err := openai.New(&openai.Config{
@@ -114,6 +119,9 @@ func (c *client) GetOrCreateConversation(id string, cfg *ConversationConfig) (co
 	}
 	if cfg.Language == "" && c.cfg.ConversationLanguage != "" {
 		cfg.Language = c.cfg.ConversationLanguage
+	}
+	if cfg.ChatGPTName == "" {
+		cfg.ChatGPTName = c.cfg.ChatGPTName
 	}
 
 	if cache, ok := c.conversationsCache.Get(cfg.ID); ok {
