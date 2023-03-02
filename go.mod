@@ -8,7 +8,7 @@ require (
 	github.com/go-zoox/dotenv v1.2.3
 	github.com/go-zoox/logger v1.4.4
 	github.com/go-zoox/lru v1.0.1
-	github.com/go-zoox/openai-client v1.2.0
+	github.com/go-zoox/openai-client v1.2.1
 	github.com/go-zoox/testify v1.0.0
 	github.com/go-zoox/uuid v0.0.1
 )
@@ -17,7 +17,7 @@ require (
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-zoox/chalk v1.0.1 // indirect
-	github.com/go-zoox/fetch v1.7.4 // indirect
+	github.com/go-zoox/fetch v1.7.5 // indirect
 	github.com/go-zoox/fs v1.3.7 // indirect
 	github.com/go-zoox/headers v1.0.5 // indirect
 	github.com/go-zoox/tag v1.2.0 // indirect
