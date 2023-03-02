@@ -37,6 +37,15 @@ type Config struct {
 	ConversationContext      string `json:"conversation_context"`
 	ConversationLanguage     string `json:"conversation_language"`
 	ChatGPTName              string `json:"chatgpt_name"`
+
+	// Proxy sets the request proxy.
+	//
+	//	support http, https, socks5
+	//	example:
+	//		http://127.0.0.1:17890
+	//		https://127.0.0.1:17890
+	//		socks5://127.0.0.1:17890
+	Proxy string `json:"proxy"`
 }
 
 // AskConfig ...
@@ -67,6 +76,7 @@ func New(cfg *Config) (Client, error) {
 	core, err := openai.New(&openai.Config{
 		APIKey:    cfg.APIKey,
 		APIServer: cfg.APIServer,
+		Proxy:     cfg.Proxy,
 	})
 	if err != nil {
 		return nil, err
