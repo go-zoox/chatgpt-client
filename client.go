@@ -84,7 +84,7 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 	// maxTokens := math.Max(float64(c.cfg.MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(c.cfg.MaxResponseTokens)))
 
 	if cfg.Model == "" {
-		cfg.Model = openai.ModelTextDavinci003
+		cfg.Model = openai.ModelGPT3_5Turbo
 	}
 
 	switch cfg.Model {
