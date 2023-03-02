@@ -105,6 +105,7 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		IsChatGPT:      false,
 		ConversationID: c.id,
 		User:           cfgX.User,
+		Role:           "user",
 		CreatedAt:      cfgX.CreatedAt,
 	})
 
@@ -113,8 +114,15 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		return nil, fmt.Errorf("failed to build prompt: %v", err)
 	}
 
-	answer, err = c.client.Ask(prompt, &AskConfig{
-		Model: c.cfg.Model,
+	messages, err := c.BuildMessages()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build messages: %v", err)
+	}
+
+	answer, err = c.client.Ask(&AskConfig{
+		Model:    c.cfg.Model,
+		Prompt:   string(prompt),
+		Messages: messages,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ask: %v", err)
@@ -125,6 +133,7 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		Text:           string(answer),
 		IsChatGPT:      true,
 		ConversationID: c.id,
+		Role:           "assistant",
 	})
 
 	return answer, nil
@@ -144,5 +153,13 @@ func (c *conversation) BuildPrompt() (prompt []byte, err error) {
 		c.messages,
 		c.cfg.MaxRequestTokens,
 		c.cfg.ChatGPTName,
+	)
+}
+
+func (c *conversation) BuildMessages() (messages []*Message, err error) {
+	return buildMessages(
+		c.cfg.Context,
+		c.messages,
+		c.cfg.MaxRequestTokens,
 	)
 }

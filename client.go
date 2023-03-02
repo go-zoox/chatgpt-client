@@ -11,7 +11,7 @@ import (
 
 // Client is the ChatGPT Client.
 type Client interface {
-	Ask(question []byte, cfg ...*AskConfig) ([]byte, error)
+	Ask(cfg *AskConfig) ([]byte, error)
 	//
 	GetOrCreateConversation(id string, cfg *ConversationConfig) (Conversation, error)
 	//
@@ -41,7 +41,9 @@ type Config struct {
 
 // AskConfig ...
 type AskConfig struct {
-	Model string `json:"model"`
+	Model    string     `json:"model"`
+	Prompt   string     `json:"prompt"`
+	Messages []*Message `json:"messages"`
 }
 
 // New creates a new ChatGPT Client.
@@ -77,23 +79,46 @@ func New(cfg *Config) (Client, error) {
 	}, nil
 }
 
-func (c *client) Ask(question []byte, cfg ...*AskConfig) (answer []byte, err error) {
+func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 	// numTokens := float64(len(question))
 	// maxTokens := math.Max(float64(c.cfg.MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(c.cfg.MaxResponseTokens)))
 
-	cfgX := &AskConfig{}
-	if len(cfg) > 0 && cfg[0] != nil {
-		cfgX = cfg[0]
-	}
-	if cfgX.Model == "" {
-		cfgX.Model = openai.ModelTextDavinci003
+	if cfg.Model == "" {
+		cfg.Model = openai.ModelTextDavinci003
 	}
 
-	questionX := string(question)
-	maxTokens := calculationPromptMaxTokens(len(question), c.cfg.MaxResponseTokens)
+	switch cfg.Model {
+	case openai.ModelGPT3_5Turbo, openai.ModelGPT3_5Turbo0301:
+		// chat
+		currentMessageLength := 0
+		messages := []openai.CreateChatCompletionMessage{}
+		for _, msg := range cfg.Messages {
+			currentMessageLength += len(msg.Text)
+			messages = append(messages, openai.CreateChatCompletionMessage{
+				Role:    msg.Role,
+				Content: msg.Text,
+			})
+		}
+
+		maxTokens := calculationPromptMaxTokens(currentMessageLength, c.cfg.MaxResponseTokens)
+		completion, err := c.core.CreateChatCompletion(&openai.CreateChatCompletionRequest{
+			Model:     cfg.Model,
+			Messages:  messages,
+			MaxTokens: maxTokens,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		return []byte(strings.TrimSpace(completion.Choices[0].Message.Content)), nil
+	}
+
+	// prompt
+	questionX := cfg.Prompt
+	maxTokens := calculationPromptMaxTokens(len(questionX), c.cfg.MaxResponseTokens)
 
 	completion, err := c.core.CreateCompletion(&openai.CreateCompletionRequest{
-		Model:     cfgX.Model,
+		Model:     cfg.Model,
 		Prompt:    questionX,
 		MaxTokens: maxTokens,
 	})
