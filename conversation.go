@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-zoox/core-utils/safe"
+	"github.com/go-zoox/core-utils/strings"
 	"github.com/go-zoox/logger"
 	"github.com/go-zoox/uuid"
 )
@@ -53,6 +54,16 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 	if cfg.ID == "" {
 		cfg.ID = uuid.V4()
 	}
+
+	// ensure language
+	if cfg.Language != "" {
+		cfg.Language = strings.ToUpper(cfg.Language)
+		// @TODO
+		if vc, ok := DefaultContextIntl[cfg.Language]; ok {
+			DefaultContext = vc
+		}
+	}
+
 	if cfg.Context == "" {
 		cfg.Context = DefaultContext
 		if cfg.Language != "" {
