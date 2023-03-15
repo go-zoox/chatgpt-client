@@ -92,6 +92,8 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 	if c.cfg.Model == "" {
 		// c.SetModel(openai.ModelGPT_4_32K)
 		c.SetModel(openai.ModelGPT3_5Turbo)
+	} else {
+		c.SetModel(c.cfg.Model)
 	}
 
 	return c, nil
