@@ -7,6 +7,7 @@ import (
 	"github.com/go-zoox/core-utils/safe"
 	"github.com/go-zoox/core-utils/strings"
 	"github.com/go-zoox/logger"
+	openai "github.com/go-zoox/openai-client"
 	"github.com/go-zoox/uuid"
 )
 
@@ -32,14 +33,18 @@ type conversation struct {
 
 // ConversationConfig is the configuration for creating a new Conversation.
 type ConversationConfig struct {
-	ID               string
-	Context          string
-	Language         string
-	MaxMessages      int
-	MaxAge           time.Duration
-	MaxRequestTokens int
-	Model            string `json:"model"`
-	ChatGPTName      string `json:"chatgpt_name"`
+	ID                       string
+	Context                  string
+	Language                 string
+	MaxMessages              int
+	MaxAge                   time.Duration
+	MaxRequestResponseTokens int64
+	Model                    string `json:"model"`
+	ChatGPTName              string `json:"chatgpt_name"`
+
+	//
+	MaxRequestTokens  int64
+	MaxResponseTokens int64
 }
 
 // ConversationAskConfig is the configuration for ask question.
@@ -53,6 +58,10 @@ type ConversationAskConfig struct {
 func NewConversation(client *client, cfg *ConversationConfig) (Conversation, error) {
 	if cfg.ID == "" {
 		cfg.ID = uuid.V4()
+	}
+
+	if cfg.Model == "" {
+		cfg.Model = openai.ModelGPT_4_32K
 	}
 
 	// ensure language
@@ -73,6 +82,11 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 	if cfg.MaxMessages == 0 {
 		cfg.MaxMessages = 100
 	}
+
+	// generate MaxRequestResponseTokens
+	cfg.MaxRequestResponseTokens = openai.GetMaxTokens(cfg.Model)
+
+	cfg.MaxRequestTokens = cfg.MaxRequestResponseTokens - cfg.MaxResponseTokens
 
 	return &conversation{
 		client:      client,
@@ -134,6 +148,8 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		Model:    c.cfg.Model,
 		Prompt:   string(prompt),
 		Messages: messages,
+		//
+		MaxRequestResponseTokens: int(c.cfg.MaxRequestResponseTokens),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ask: %v", err)
@@ -162,7 +178,7 @@ func (c *conversation) BuildPrompt() (prompt []byte, err error) {
 	return buildPrompt(
 		c.cfg.Context,
 		c.messages,
-		c.cfg.MaxRequestTokens,
+		int(c.cfg.MaxRequestTokens),
 		c.cfg.ChatGPTName,
 	)
 }
@@ -171,6 +187,6 @@ func (c *conversation) BuildMessages() (messages []*Message, err error) {
 	return buildMessages(
 		c.cfg.Context,
 		c.messages,
-		c.cfg.MaxRequestTokens,
+		int(c.cfg.MaxRequestTokens),
 	)
 }

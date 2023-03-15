@@ -71,7 +71,7 @@ func TestMaxTokens(t *testing.T) {
 	// fmt.Println("DefaultMaxResponseTokens:", DefaultMaxResponseTokens)
 	// fmt.Println("maxTokens:", maxTokens)
 
-	maxTokens := calculationPromptMaxTokens(len(question), DefaultMaxResponseTokens)
+	maxTokens := calculationPromptMaxTokens(len(question), 4097, DefaultMaxResponseTokens)
 	if maxTokens != DefaultMaxResponseTokens {
 		t.Fatalf("expected %d, but got %d", DefaultMaxResponseTokens, maxTokens)
 	}
