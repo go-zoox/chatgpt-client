@@ -20,6 +20,8 @@ type Conversation interface {
 	Messages() *safe.List
 	//
 	BuildPrompt() (prompt []byte, err error)
+	//
+	SetModel(model string) error
 }
 
 type conversation struct {
@@ -60,11 +62,6 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 		cfg.ID = uuid.V4()
 	}
 
-	if cfg.Model == "" {
-		// cfg.Model = openai.ModelGPT_4_32K
-		cfg.Model = openai.ModelGPT3_5Turbo
-	}
-
 	// ensure language
 	if cfg.Language != "" {
 		cfg.Language = strings.ToUpper(cfg.Language)
@@ -84,18 +81,20 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 		cfg.MaxMessages = 100
 	}
 
-	// generate MaxRequestResponseTokens
-	cfg.MaxRequestResponseTokens = openai.GetMaxTokens(cfg.Model)
-
-	cfg.MaxRequestTokens = cfg.MaxRequestResponseTokens - cfg.MaxResponseTokens
-
-	return &conversation{
+	c := &conversation{
 		client:      client,
 		id:          cfg.ID,
 		messages:    safe.NewList(cfg.MaxMessages),
 		messagesMap: safe.NewMap(),
 		cfg:         cfg,
-	}, nil
+	}
+
+	if c.cfg.Model == "" {
+		// c.SetModel(openai.ModelGPT_4_32K)
+		c.SetModel(openai.ModelGPT3_5Turbo)
+	}
+
+	return c, nil
 }
 
 func (c *conversation) IsQuestionAsked(id string) (err error) {
@@ -190,4 +189,14 @@ func (c *conversation) BuildMessages() (messages []*Message, err error) {
 		c.messages,
 		int(c.cfg.MaxRequestTokens),
 	)
+}
+
+func (c *conversation) SetModel(model string) error {
+	c.cfg.Model = model
+
+	// generate MaxRequestResponseTokens
+	c.cfg.MaxRequestResponseTokens = openai.GetMaxTokens(c.cfg.Model)
+	c.cfg.MaxRequestTokens = c.cfg.MaxRequestResponseTokens - c.cfg.MaxResponseTokens
+
+	return nil
 }

@@ -1,6 +1,7 @@
 package chatgptclient
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/go-zoox/core-utils/strings"
@@ -17,6 +18,9 @@ type Client interface {
 	//
 	ResetConversations() error
 	ResetConversation(id string) error
+
+	//
+	ChangeConversationModel(conversationID string, model string) error
 }
 
 type client struct {
@@ -181,6 +185,25 @@ func (c *client) ResetConversation(id string) error {
 	c.conversationsCache.Delete(id)
 
 	return nil
+}
+
+func (c *client) GetConversation(id string) (conversation Conversation, err error) {
+	if cache, ok := c.conversationsCache.Get(id); ok {
+		if c, ok := cache.(Conversation); ok {
+			return c, nil
+		}
+	}
+
+	return nil, fmt.Errorf("conversation(id: %s) not found", id)
+}
+
+func (c *client) ChangeConversationModel(conversationID string, model string) error {
+	conversation, err := c.GetConversation(conversationID)
+	if err != nil {
+		return err
+	}
+
+	return conversation.SetModel(model)
 }
 
 func calculationPromptMaxTokens(questLength, MaxRequestResponseTokens, MaxResponseTokens int) int {
