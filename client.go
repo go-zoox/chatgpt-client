@@ -28,15 +28,15 @@ type client struct {
 
 // Config is the configuration for the ChatGPT Client.
 type Config struct {
-	APIKey                   string `json:"api_key"`
-	APIServer                string `json:"api_server"`
-	MaxRequestResponseTokens int    `json:"max_request_response_tokens"`
-	MaxResponseTokens        int    `json:"max_response_tokens"`
-	MaxConversations         int    `json:"max_conversations"`
-	ConversationMaxAge       int    `json:"conversation_max_age"`
-	ConversationContext      string `json:"conversation_context"`
-	ConversationLanguage     string `json:"conversation_language"`
-	ChatGPTName              string `json:"chatgpt_name"`
+	APIKey    string `json:"api_key"`
+	APIServer string `json:"api_server"`
+	// MaxRequestResponseTokens int    `json:"max_request_response_tokens"`
+	MaxResponseTokens    int    `json:"max_response_tokens"`
+	MaxConversations     int    `json:"max_conversations"`
+	ConversationMaxAge   int    `json:"conversation_max_age"`
+	ConversationContext  string `json:"conversation_context"`
+	ConversationLanguage string `json:"conversation_language"`
+	ChatGPTName          string `json:"chatgpt_name"`
 
 	// Proxy sets the request proxy.
 	//
@@ -53,13 +53,15 @@ type AskConfig struct {
 	Model    string     `json:"model"`
 	Prompt   string     `json:"prompt"`
 	Messages []*Message `json:"messages"`
+	//
+	MaxRequestResponseTokens int `json:"max_request_response_tokens"`
 }
 
 // New creates a new ChatGPT Client.
 func New(cfg *Config) (Client, error) {
-	if cfg.MaxRequestResponseTokens == 0 {
-		cfg.MaxRequestResponseTokens = DefaultMaxRequestResponseTokens
-	}
+	// if cfg.MaxRequestResponseTokens == 0 {
+	// 	cfg.MaxRequestResponseTokens = DefaultMaxRequestResponseTokens
+	// }
 
 	if cfg.MaxResponseTokens == 0 {
 		cfg.MaxResponseTokens = DefaultMaxResponseTokens
@@ -93,10 +95,6 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 	// numTokens := float64(len(question))
 	// maxTokens := math.Max(float64(c.cfg.MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(c.cfg.MaxResponseTokens)))
 
-	if cfg.Model == "" {
-		cfg.Model = openai.ModelGPT3_5Turbo
-	}
-
 	switch cfg.Model {
 	case openai.ModelGPT3_5Turbo, openai.ModelGPT3_5Turbo0301:
 		// chat
@@ -110,7 +108,7 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 			})
 		}
 
-		maxTokens := calculationPromptMaxTokens(currentMessageLength, c.cfg.MaxResponseTokens)
+		maxTokens := calculationPromptMaxTokens(currentMessageLength, cfg.MaxRequestResponseTokens, c.cfg.MaxResponseTokens)
 		completion, err := c.core.CreateChatCompletion(&openai.CreateChatCompletionRequest{
 			Model:     cfg.Model,
 			Messages:  messages,
@@ -125,7 +123,7 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 
 	// prompt
 	questionX := cfg.Prompt
-	maxTokens := calculationPromptMaxTokens(len(questionX), c.cfg.MaxResponseTokens)
+	maxTokens := calculationPromptMaxTokens(len(questionX), cfg.MaxRequestResponseTokens, c.cfg.MaxResponseTokens)
 
 	completion, err := c.core.CreateCompletion(&openai.CreateCompletionRequest{
 		Model:     cfg.Model,
@@ -145,9 +143,6 @@ func (c *client) GetOrCreateConversation(id string, cfg *ConversationConfig) (co
 	}
 	if cfg.MaxAge == 0 {
 		cfg.MaxAge = DefaultConversationMaxAge
-	}
-	if cfg.MaxRequestTokens == 0 {
-		cfg.MaxRequestTokens = c.cfg.MaxRequestResponseTokens - c.cfg.MaxResponseTokens
 	}
 	if cfg.Context == "" && c.cfg.ConversationContext != "" {
 		cfg.Context = c.cfg.ConversationContext
@@ -188,9 +183,9 @@ func (c *client) ResetConversation(id string) error {
 	return nil
 }
 
-func calculationPromptMaxTokens(questLength, MaxResponseTokens int) int {
-	numTokens := float64(questLength)
-	maxTokens := math.Max(float64(MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(MaxResponseTokens)))
+func calculationPromptMaxTokens(questLength, MaxRequestResponseTokens, MaxResponseTokens int) int {
+	numTokens := questLength
+	maxTokens := math.Max(float64(MaxResponseTokens), math.Min(float64(MaxRequestResponseTokens-numTokens), float64(MaxResponseTokens)))
 
 	return int(maxTokens)
 }
