@@ -61,7 +61,8 @@ func NewConversation(client *client, cfg *ConversationConfig) (Conversation, err
 	}
 
 	if cfg.Model == "" {
-		cfg.Model = openai.ModelGPT_4_32K
+		// cfg.Model = openai.ModelGPT_4_32K
+		cfg.Model = openai.ModelGPT3_5Turbo
 	}
 
 	// ensure language
