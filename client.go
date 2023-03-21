@@ -20,7 +20,8 @@ type Client interface {
 	ResetConversation(id string) error
 
 	//
-	ChangeConversationModel(conversationID string, model string) error
+	ChangeConversationModel(conversationID string, model string, cfg *ConversationConfig) error
+	GetConversationModel(conversationID string, cfg *ConversationConfig) (string, error)
 }
 
 type client struct {
@@ -100,7 +101,9 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 	// maxTokens := math.Max(float64(c.cfg.MaxResponseTokens), math.Min(openai.MaxTokens-numTokens, float64(c.cfg.MaxResponseTokens)))
 
 	switch cfg.Model {
-	case openai.ModelGPT3_5Turbo, openai.ModelGPT3_5Turbo0301:
+	case openai.ModelGPT3_5Turbo, openai.ModelGPT3_5Turbo0301,
+		openai.ModelGPT_4, openai.ModelGPT_4_0314,
+		openai.ModelGPT_4_32K, openai.ModelGPT_4_32K_0314:
 		// chat
 		currentMessageLength := 0
 		messages := []openai.CreateChatCompletionMessage{}
@@ -197,8 +200,17 @@ func (c *client) GetConversation(id string) (conversation Conversation, err erro
 	return nil, fmt.Errorf("conversation(id: %s) not found", id)
 }
 
-func (c *client) ChangeConversationModel(conversationID string, model string) error {
-	conversation, err := c.GetConversation(conversationID)
+func (c *client) GetConversationModel(conversationID string, cfg *ConversationConfig) (string, error) {
+	conversation, err := c.GetOrCreateConversation(conversationID, cfg)
+	if err != nil {
+		return "", err
+	}
+
+	return conversation.GetModel(), nil
+}
+
+func (c *client) ChangeConversationModel(conversationID string, model string, cfg *ConversationConfig) error {
+	conversation, err := c.GetOrCreateConversation(conversationID, cfg)
 	if err != nil {
 		return err
 	}

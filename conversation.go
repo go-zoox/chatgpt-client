@@ -22,6 +22,7 @@ type Conversation interface {
 	BuildPrompt() (prompt []byte, err error)
 	//
 	SetModel(model string) error
+	GetModel() string
 }
 
 type conversation struct {
@@ -191,6 +192,10 @@ func (c *conversation) BuildMessages() (messages []*Message, err error) {
 		c.messages,
 		int(c.cfg.MaxRequestTokens),
 	)
+}
+
+func (c *conversation) GetModel() string {
+	return c.cfg.Model
 }
 
 func (c *conversation) SetModel(model string) error {
