@@ -3,6 +3,7 @@ package chatgptclient
 import (
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/go-zoox/core-utils/strings"
 	"github.com/go-zoox/lru"
@@ -51,6 +52,9 @@ type Config struct {
 	//		https://127.0.0.1:17890
 	//		socks5://127.0.0.1:17890
 	Proxy string `json:"proxy"`
+
+	// Timeout sets the request timeout.
+	Timeout time.Duration `json:"timeout"`
 }
 
 // AskConfig ...
@@ -84,6 +88,7 @@ func New(cfg *Config) (Client, error) {
 		APIKey:    cfg.APIKey,
 		APIServer: cfg.APIServer,
 		Proxy:     cfg.Proxy,
+		Timeout:   cfg.Timeout,
 	})
 	if err != nil {
 		return nil, err
