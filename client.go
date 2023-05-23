@@ -40,11 +40,15 @@ type Config struct {
 	// AZure
 	// APIType specify the OpenAI API Type, available: azure, default: empty (openai).
 	APIType string `json:"api_type"`
-	// APIVersion specify the OpenAI API Version, available: v1, default: empty (v1).
-	// if APIType is azure, APIVersion should not be empty.
-	APIVersion string `json:"api_version"`
+
+	// AzureResource is the Azure Resource.
+	AzureResource string `json:"azure_resource"`
+
 	// AzureDeployment is the Azure Deployment.
 	AzureDeployment string `json:"azure_deployment"`
+
+	// AzureAPIVersion is the Azure API Version.
+	AzureAPIVersion string `json:"azure_api_version"`
 
 	// MaxRequestResponseTokens int    `json:"max_request_response_tokens"`
 	MaxResponseTokens    int    `json:"max_response_tokens"`
@@ -98,8 +102,9 @@ func New(cfg *Config) (Client, error) {
 		APIKey:          cfg.APIKey,
 		APIServer:       cfg.APIServer,
 		APIType:         cfg.APIType,
-		APIVersion:      cfg.APIVersion,
+		AzureResource:   cfg.AzureResource,
 		AzureDeployment: cfg.AzureDeployment,
+		AzureAPIVersion: cfg.AzureAPIVersion,
 		Proxy:           cfg.Proxy,
 		Timeout:         cfg.Timeout,
 	})
