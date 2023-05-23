@@ -36,6 +36,16 @@ type client struct {
 type Config struct {
 	APIKey    string `json:"api_key"`
 	APIServer string `json:"api_server"`
+
+	// AZure
+	// APIType specify the OpenAI API Type, available: azure, default: empty (openai).
+	APIType string `json:"api_type"`
+	// APIVersion specify the OpenAI API Version, available: v1, default: empty (v1).
+	// if APIType is azure, APIVersion should not be empty.
+	APIVersion string `json:"api_version"`
+	// AzureDeployment is the Azure Deployment.
+	AzureDeployment string `json:"azure_deployment"`
+
 	// MaxRequestResponseTokens int    `json:"max_request_response_tokens"`
 	MaxResponseTokens    int    `json:"max_response_tokens"`
 	MaxConversations     int    `json:"max_conversations"`
@@ -85,10 +95,13 @@ func New(cfg *Config) (Client, error) {
 	}
 
 	core, err := openai.New(&openai.Config{
-		APIKey:    cfg.APIKey,
-		APIServer: cfg.APIServer,
-		Proxy:     cfg.Proxy,
-		Timeout:   cfg.Timeout,
+		APIKey:          cfg.APIKey,
+		APIServer:       cfg.APIServer,
+		APIType:         cfg.APIType,
+		APIVersion:      cfg.APIVersion,
+		AzureDeployment: cfg.AzureDeployment,
+		Proxy:           cfg.Proxy,
+		Timeout:         cfg.Timeout,
 	})
 	if err != nil {
 		return nil, err
