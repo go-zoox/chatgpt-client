@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-zoox/core-utils/strings"
 	"github.com/go-zoox/lru"
+	openaiclient "github.com/go-zoox/openai-client"
 
 	openai "github.com/go-zoox/openai-client"
 )
@@ -14,6 +15,9 @@ import (
 // Client is the ChatGPT Client.
 type Client interface {
 	Ask(cfg *AskConfig) ([]byte, error)
+	//
+	ImageGeneration(cfg *openaiclient.ImageGenerationRequest) (*openaiclient.ImageGenerationResponse, error)
+
 	//
 	GetOrCreateConversation(id string, cfg *ConversationConfig) (Conversation, error)
 	//
