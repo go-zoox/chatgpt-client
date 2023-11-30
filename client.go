@@ -82,6 +82,8 @@ type AskConfig struct {
 	Messages []*Message `json:"messages"`
 	//
 	MaxRequestResponseTokens int `json:"max_request_response_tokens"`
+	//
+	Temperature float64 `json:"temperature"`
 }
 
 // New creates a new ChatGPT Client.
@@ -160,9 +162,10 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 	maxTokens := calculationPromptMaxTokens(len(questionX), cfg.MaxRequestResponseTokens, c.cfg.MaxResponseTokens)
 
 	completion, err := c.core.CreateCompletion(&openai.CreateCompletionRequest{
-		Model:     cfg.Model,
-		Prompt:    questionX,
-		MaxTokens: maxTokens,
+		Model:       cfg.Model,
+		Prompt:      questionX,
+		MaxTokens:   maxTokens,
+		Temperature: float64(cfg.MaxRequestResponseTokens),
 	})
 	if err != nil {
 		return nil, err

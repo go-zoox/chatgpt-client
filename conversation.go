@@ -42,8 +42,9 @@ type ConversationConfig struct {
 	MaxMessages              int
 	MaxAge                   time.Duration
 	MaxRequestResponseTokens int64
-	Model                    string `json:"model"`
-	ChatGPTName              string `json:"chatgpt_name"`
+	Model                    string  `json:"model"`
+	Temperature              float64 `json:"temperature"`
+	ChatGPTName              string  `json:"chatgpt_name"`
 
 	//
 	MaxRequestTokens  int64
@@ -52,9 +53,10 @@ type ConversationConfig struct {
 
 // ConversationAskConfig is the configuration for ask question.
 type ConversationAskConfig struct {
-	ID        string    `json:"id"`
-	User      string    `json:"user"`
-	CreatedAt time.Time `json:"created_at"`
+	ID          string    `json:"id"`
+	User        string    `json:"user"`
+	Temperature float64   `json:"temperature"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 // NewConversation creates a new Conversation.
@@ -147,12 +149,19 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		return nil, fmt.Errorf("failed to build messages: %v", err)
 	}
 
+	temperature := cfgX.Temperature
+	if c.cfg.Temperature != 0 {
+		temperature = c.cfg.Temperature
+	}
+
 	answer, err = c.client.Ask(&AskConfig{
 		Model:    c.cfg.Model,
 		Prompt:   string(prompt),
 		Messages: messages,
 		//
 		MaxRequestResponseTokens: int(c.cfg.MaxRequestResponseTokens),
+		//
+		Temperature: temperature,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ask: %v", err)
