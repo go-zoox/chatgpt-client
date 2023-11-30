@@ -149,9 +149,9 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 		return nil, fmt.Errorf("failed to build messages: %v", err)
 	}
 
-	temperature := cfgX.Temperature
-	if c.cfg.Temperature != 0 {
-		temperature = c.cfg.Temperature
+	temperature := c.cfg.Temperature
+	if cfgX.Temperature != 0 {
+		temperature = cfgX.Temperature
 	}
 
 	answer, err = c.client.Ask(&AskConfig{
