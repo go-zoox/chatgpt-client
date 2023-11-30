@@ -1,4 +1,4 @@
 package chatgptclient
 
 // Version is the version of this package
-var Version = "1.6.2"
+var Version = "1.6.3"
