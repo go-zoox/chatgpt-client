@@ -132,7 +132,8 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 	switch cfg.Model {
 	case openai.ModelGPT3_5Turbo, openai.ModelGPT3_5Turbo0301,
 		openai.ModelGPT_4, openai.ModelGPT_4_0314,
-		openai.ModelGPT_4_32K, openai.ModelGPT_4_32K_0314:
+		openai.ModelGPT_4_32K, openai.ModelGPT_4_32K_0314,
+		openai.ModelGPT_4_Turbo, openai.ModelGPT_4_1106_Preview:
 		// chat
 		currentMessageLength := 0
 		messages := []openai.CreateChatCompletionMessage{}
@@ -146,9 +147,10 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 
 		maxTokens := calculationPromptMaxTokens(currentMessageLength, cfg.MaxRequestResponseTokens, c.cfg.MaxResponseTokens)
 		completion, err := c.core.CreateChatCompletion(&openai.CreateChatCompletionRequest{
-			Model:     cfg.Model,
-			Messages:  messages,
-			MaxTokens: maxTokens,
+			Model:       cfg.Model,
+			Messages:    messages,
+			MaxTokens:   maxTokens,
+			Temperature: cfg.Temperature,
 		})
 		if err != nil {
 			return nil, err
