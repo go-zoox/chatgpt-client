@@ -133,7 +133,8 @@ func (c *client) Ask(cfg *AskConfig) (answer []byte, err error) {
 	case openai.ModelGPT3_5Turbo, openai.ModelGPT3_5Turbo0301,
 		openai.ModelGPT_4, openai.ModelGPT_4_0314,
 		openai.ModelGPT_4_32K, openai.ModelGPT_4_32K_0314,
-		openai.ModelGPT_4_Turbo, openai.ModelGPT_4_1106_Preview:
+		openai.ModelGPT_4_Turbo, openai.ModelGPT_4_1106_Preview,
+		openai.ModelQwenMax:
 		// chat
 		currentMessageLength := 0
 		messages := []openai.CreateChatCompletionMessage{}
