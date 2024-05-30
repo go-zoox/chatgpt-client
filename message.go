@@ -48,10 +48,10 @@ func buildMessages(context string, messages *safe.List, maxLength int) (messages
 		return false
 	})
 
-	messagesX = append(messagesX, &Message{
-		Role: "system",
-		Text: contextMessage,
-	})
+	// messagesX = append(messagesX, &Message{
+	// 	Role: "assistant",
+	// 	Text: contextMessage,
+	// })
 
 	return
 }
